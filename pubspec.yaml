@@ -1,0 +1,4 @@
+name: wamp
+version: 0.0.1
+description: An implementation of the WAMP (http://wamp.ws) protocol for Dart.
+author: George Moschovitis <george.moschovitis@gmail.com>
