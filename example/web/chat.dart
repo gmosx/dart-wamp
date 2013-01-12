@@ -1,5 +1,5 @@
 import 'dart:html';
-import 'package:wamp/client.dart';
+import 'package:wamp/wamp_client.dart';
 
 class ChatClient extends WampClient {
   ChatClient(ws) : super(ws);
@@ -13,7 +13,7 @@ class ChatClient extends WampClient {
 }
 
 void main() {
-  var ws = new WebSocket('ws://127.0.0.1:8080/ws'),
+  var ws = new WebSocket('wss://127.0.0.1:8080/ws'),
       client = new ChatClient(ws);
 
   var sendButton = query('#send'),
