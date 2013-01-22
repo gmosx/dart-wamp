@@ -1,8 +1,9 @@
 library wamp.server;
 
 import 'dart:io';
-import 'dart:json';
+import 'dart:json' as JSON;
 import 'dart:math';
+import 'dart:async';
 import 'package:wamp/wamp.dart';
 
 part 'src/server/client.dart';
