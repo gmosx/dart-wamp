@@ -103,7 +103,7 @@ class WampHandler {
 
     // TODO: perfome gc when the client is disconnected?
     if (!garbage.isEmpty) {
-      garbage.forEach((c) => clients.remove(c));
+      garbage.forEach((c) => subscribers.remove(c));
     }
   }
 }
