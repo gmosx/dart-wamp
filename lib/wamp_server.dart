@@ -8,6 +8,9 @@ import 'package:wamp/wamp.dart';
 
 part 'src/server/client.dart';
 
+/**
+ * Handler for wamp connections.
+ */
 class WampHandler {
   Set<Client> clients = new Set();
   Map<String, Set<Client>> topicMap = new Map();
@@ -49,10 +52,6 @@ class WampHandler {
       }
 
     };
-
-//    conn.onClosed = (e) {
-//      clients.remove(c);
-//    };
   }
 
   void onCall(Client c, String callId, String uri, arg) {
@@ -81,12 +80,7 @@ class WampHandler {
   }
 
   void onPublish(Client c, String topicUri, event, [exclude, eligible]) {
-//    var uri = curie.decode(topicUri);
-//
-//    clients.forEach((client) {
-//      client.event(topicUri, event);
-//    });
-
+    // TODO: handle exclude, eligible.
     publish(topicUri, event);
   }
 
@@ -95,10 +89,21 @@ class WampHandler {
    */
   void publish(String topicUri, event) {
     final uri = curie.decode(topicUri),
-          subscribers = topicMap[uri];
+          subscribers = topicMap[uri],
+          garbage = [];
 
     subscribers.forEach((client) {
-      client.event(topicUri, event);
+      if (clients.contains(client)) {
+        client.event(topicUri, event);
+      } else {
+        // The client is disconnected, so gc.
+        garbage.add(client);
+      }
     });
+
+    // TODO: perfome gc when the client is disconnected?
+    if (!garbage.isEmpty) {
+      garbage.forEach((c) => clients.remove(c));
+    }
   }
 }
