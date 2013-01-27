@@ -23,6 +23,7 @@ class WampHandler {
     clients.add(c);
 
     conn.onClosed = (int status, String reason) {
+      c.topics.forEach((t) => _unsubscribe(c, t));
       clients.remove(c);
     };
 
@@ -69,14 +70,10 @@ class WampHandler {
   }
 
   void onUnsubscribe(Client c, String topicUri) {
-    var uri = curie.decode(topicUri);
-
+    final uri = curie.decode(topicUri);
     c.topics.remove(uri);
 
-    if (topicMap.containsKey(uri)) {
-      topicMap[uri].remove(c);
-      if (topicMap[uri].isEmpty) topicMap.remove(uri);
-    }
+    _unsubscribe(c, topicUri);
   }
 
   void onPublish(Client c, String topicUri, event, [exclude, eligible]) {
@@ -84,26 +81,26 @@ class WampHandler {
     publish(topicUri, event);
   }
 
+  void _unsubscribe(Client c, String topicUri) {
+    var uri = curie.decode(topicUri);
+
+    if (topicMap.containsKey(uri)) {
+      topicMap[uri].remove(c);
+      if (topicMap[uri].isEmpty) topicMap.remove(uri);
+    }
+  }
+
   /**
    * Publish an event to all the subscribed clients.
    */
   void publish(String topicUri, event) {
     final uri = curie.decode(topicUri),
-          subscribers = topicMap[uri],
-          garbage = [];
+          subscribers = topicMap[uri];
 
     subscribers.forEach((client) {
       if (clients.contains(client)) {
         client.event(topicUri, event);
-      } else {
-        // The client is disconnected, so gc.
-        garbage.add(client);
       }
     });
-
-    // TODO: perfome gc when the client is disconnected?
-    if (!garbage.isEmpty) {
-      garbage.forEach((c) => subscribers.remove(c));
-    }
   }
 }
