@@ -5,6 +5,7 @@ class ChatClient extends WampClient {
   ChatClient(ws) : super(ws);
 
   onWelcome() {
+    subscribe('chat:room');
   }
 
   onEvent(topicUri, event) {

@@ -55,7 +55,7 @@ class WampHandler {
 //    };
   }
 
-  void onCall(Client c, String callId, String uri, String arg) {
+  void onCall(Client c, String callId, String uri, arg) {
   }
 
   void onSubscribe(Client c, String topicUri) {
@@ -81,9 +81,23 @@ class WampHandler {
   }
 
   void onPublish(Client c, String topicUri, event, [exclude, eligible]) {
-    var uri = curie.decode(topicUri);
+//    var uri = curie.decode(topicUri);
+//
+//    clients.forEach((client) {
+//      client.event(topicUri, event);
+//    });
 
-    clients.forEach((client) {
+    publish(topicUri, event);
+  }
+
+  /**
+   * Publish an event to all the subscribed clients.
+   */
+  void publish(String topicUri, event) {
+    final uri = curie.decode(topicUri),
+          subscribers = topicMap[uri];
+
+    subscribers.forEach((client) {
       client.event(topicUri, event);
     });
   }
