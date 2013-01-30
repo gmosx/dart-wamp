@@ -94,13 +94,16 @@ class WampHandler {
    * Publish an event to all the subscribed clients.
    */
   void publish(String topicUri, event) {
-    final uri = curie.decode(topicUri),
-          subscribers = topicMap[uri];
+    final uri = curie.decode(topicUri);
 
-    subscribers.forEach((client) {
-      if (clients.contains(client)) {
-        client.event(topicUri, event);
-      }
-    });
+    if (topicMap.containsKey(uri)) {
+      final subscribers = topicMap[uri];
+
+      subscribers.forEach((client) {
+        if (clients.contains(client)) {
+          client.event(topicUri, event);
+        }
+      });
+    }
   }
 }
