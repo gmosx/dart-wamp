@@ -9,7 +9,7 @@ import 'package:wamp/wamp.dart';
 part 'src/server/client.dart';
 
 /**
- * Handler for wamp connections.
+ * Server-side handler for wamp connections.
  */
 class WampHandler {
   Set<Client> clients = new Set();
@@ -50,13 +50,15 @@ class WampHandler {
           onPublish(c, msg[1], msg[2]/*, msg[3], msg[4]*/);
           break;
       }
-
     };
   }
 
   void onCall(Client c, String callId, String uri, arg) {
   }
 
+  /**
+   * Handle subscription events.
+   */
   void onSubscribe(Client c, String topicUri) {
     var uri = curie.decode(topicUri);
 
@@ -65,6 +67,7 @@ class WampHandler {
     if (!topicMap.containsKey(uri)) {
       topicMap[uri] = new Set();
     }
+
     topicMap[uri].add(c);
   }
 
@@ -75,8 +78,7 @@ class WampHandler {
     _unsubscribe(c, topicUri);
   }
 
-  void onPublish(Client c, String topicUri, event, [exclude, eligible]) {
-    // TODO: handle exclude, eligible.
+  void onPublish(Client c, String topicUri, event, [exclude, eligible]) { // TODO: handle exclude, eligible.
     publish(topicUri, event);
   }
 

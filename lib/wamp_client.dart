@@ -8,6 +8,9 @@ import 'package:wamp/wamp.dart';
 
 // TODO: add reconnect functionality.
 
+/**
+ * WAMP client.
+ */
 class WampClient {
   WebSocket _ws;
 
