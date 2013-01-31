@@ -16,7 +16,7 @@ class WampClient {
   Map<String, Completer> callCompleters = new Map();
 
   WampClient(this._ws) {
-    _ws.on.message.add((e) => onMessage(JSON.parse(e.data)));
+    _ws.onMessage.listen((e) => onMessage(JSON.parse(e.data)));
   }
 
   void onMessage(msg) {

@@ -17,8 +17,7 @@ class WampHandler {
   CurieCodec curie = new CurieCodec();
 
   onOpen(WebSocketConnection conn) {
-    var c = new Client(conn)
-        ..welcome();
+    var c = new Client(conn)..welcome();
 
     clients.add(c);
 
