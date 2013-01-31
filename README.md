@@ -15,4 +15,10 @@ https://github.com/gmosx/dart-wamp
 Example
 -------
 
-Have a look at the included example that implementes a simple chat room.
+Have a look at the included example that implements a simple chat room.
+
+Legal
+-----
+
+WAMP and the  logo are trademarks of Tavendo GmbH. All other trademarks are 
+those of their respective companies.

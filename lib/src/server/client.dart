@@ -20,7 +20,7 @@ class Client {
     send([MessageType.WELCOME, sessionId, PROTOCOL_VERSION, serverId]);
   }
 
-  void callResult(String callId, result) {
+  void callResult(String callId, result) { // TODO: if result is not a String, call JSON.stringify();
     send([MessageType.CALL_RESULT, callId, result]);
   }
 
