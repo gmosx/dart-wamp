@@ -15,44 +15,47 @@ class WampHandler {
   Set<Client> clients = new Set();
   Map<String, Set<Client>> topicMap = new Map();
   CurieCodec curie = new CurieCodec();
-
-  onOpen(WebSocketConnection conn) {
-    var c = new Client(conn)..welcome();
+  
+  void handle(WebSocket socket) {
+    var c = new Client(socket)..welcome();
 
     clients.add(c);
 
-    conn.onClosed = (int status, String reason) {
-      c.topics.forEach((t) => _unsubscribe(c, t));
-      clients.remove(c);
-    };
+    socket.listen((e) {
+      if (e is MessageEvent) {
+        var msg = JSON.parse(e.data);
 
-    conn.onMessage = (m) {
-      var msg = JSON.parse(m);
+        switch(msg[0]) {
+          case MessageType.PREFIX:
+            c.prefixes[msg[1]] = msg[2];
+            break;
 
-      switch(msg[0]) {
-        case MessageType.PREFIX:
-          c.prefixes[msg[1]] = msg[2];
-          break;
+          case MessageType.CALL:
+            onCall(c, msg[1], msg[2], msg[3]);
+            break;
 
-        case MessageType.CALL:
-          onCall(c, msg[1], msg[2], msg[3]);
-          break;
+          case MessageType.SUBSCRIBE:
+            onSubscribe(c, msg[1]);
+            break;
 
-        case MessageType.SUBSCRIBE:
-          onSubscribe(c, msg[1]);
-          break;
+          case MessageType.UNSUBSCRIBE:
+            onUnsubscribe(c, msg[1]);
+            break;
 
-        case MessageType.UNSUBSCRIBE:
-          onUnsubscribe(c, msg[1]);
-          break;
-
-        case MessageType.PUBLISH:
-          onPublish(c, msg[1], msg[2]/*, msg[3], msg[4]*/);
-          break;
+          case MessageType.PUBLISH:
+            onPublish(c, msg[1], msg[2]/*, msg[3], msg[4]*/);
+            break;
+        }
+      } else if (e is CloseEvent) {
+        c.topics.forEach((t) => _unsubscribe(c, t));
+        clients.remove(c);
       }
-    };
+    });
   }
 
+  /**
+   * To be overriden by subclasses.
+   */
   void onCall(Client c, String callId, String uri, arg) {
   }
 

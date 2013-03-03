@@ -8,13 +8,13 @@ class ChatHandler extends WampHandler {
 }
 
 void main() {
-  HttpServer server = new HttpServer();
-
-//  server.onError = (error) => print(error);
-  server.listen('127.0.0.1', 8080);
-
-  WebSocketHandler wsHandler = new WebSocketHandler();
-  wsHandler.onOpen = new ChatHandler().onOpen;
-
-  server.addRequestHandler((req) => req.path == "/ws", wsHandler.onRequest);
+  final chatHandler = new ChatHandler();
+  
+  HttpServer.bind('127.0.0.1', 8080).then((HttpServer server) {
+    server.where((request) => request.uri.path == '/ws')
+          .transform(new WebSocketTransformer())
+          .listen((WebSocket socket) {
+            chatHandler.handle(socket);
+          });
+  });  
 }

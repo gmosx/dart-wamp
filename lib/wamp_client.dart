@@ -12,14 +12,14 @@ import 'package:wamp/wamp.dart';
  * WAMP client.
  */
 class WampClient {
-  WebSocket _ws;
+  WebSocket _socket;
 
   String sessionId;
   Map<String, String> prefixes = new Map();
   Map<String, Completer> callCompleters = new Map();
 
-  WampClient(this._ws) {
-    _ws.onMessage.listen((e) => onMessage(JSON.parse(e.data)));
+  WampClient(this._socket) {
+    _socket.onMessage.listen((e) => onMessage(JSON.parse(e.data)));
   }
 
   void onMessage(msg) {
@@ -50,7 +50,7 @@ class WampClient {
   }
 
   void send(msg) {
-    _ws.send(JSON.stringify(msg));
+    _socket.send(JSON.stringify(msg));
   }
 
   void onWelcome() {

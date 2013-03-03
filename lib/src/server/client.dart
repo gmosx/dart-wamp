@@ -2,18 +2,18 @@ part of wamp.server;
 
 class Client {
   String sessionId;
-  WebSocketConnection conn;
+  WebSocket socket;
 
   Set<String> topics = new Set();
   Map<String, String> prefixes = new Map();
 
-  Client(this.conn) {
+  Client(this.socket) {
     var rnd = new Random();
     sessionId = rnd.nextInt(99999).toString(); // TODO: use some kind of hash.
   }
 
   void send(msg) {
-    conn.send(JSON.stringify(msg));
+    socket.send(JSON.stringify(msg));
   }
 
   void welcome([serverId = "srv"]) {
