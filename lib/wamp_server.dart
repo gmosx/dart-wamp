@@ -21,35 +21,33 @@ class WampHandler {
 
     clients.add(c);
 
-    socket.listen((e) {
-      if (e is MessageEvent) {
-        var msg = JSON.parse(e.data);
+    socket.listen((data) {
+      final msg = JSON.parse(data);
 
-        switch(msg[0]) {
-          case MessageType.PREFIX:
-            c.prefixes[msg[1]] = msg[2];
-            break;
+      switch(msg[0]) {
+        case MessageType.PREFIX:
+          c.prefixes[msg[1]] = msg[2];
+          break;
 
-          case MessageType.CALL:
-            onCall(c, msg[1], msg[2], msg[3]);
-            break;
+        case MessageType.CALL:
+          onCall(c, msg[1], msg[2], msg[3]);
+          break;
 
-          case MessageType.SUBSCRIBE:
-            onSubscribe(c, msg[1]);
-            break;
+        case MessageType.SUBSCRIBE:
+          onSubscribe(c, msg[1]);
+          break;
 
-          case MessageType.UNSUBSCRIBE:
-            onUnsubscribe(c, msg[1]);
-            break;
+        case MessageType.UNSUBSCRIBE:
+          onUnsubscribe(c, msg[1]);
+          break;
 
-          case MessageType.PUBLISH:
-            onPublish(c, msg[1], msg[2]/*, msg[3], msg[4]*/);
-            break;
-        }
-      } else if (e is CloseEvent) {
-        c.topics.forEach((t) => _unsubscribe(c, t));
-        clients.remove(c);
+        case MessageType.PUBLISH:
+          onPublish(c, msg[1], msg[2]/*, msg[3], msg[4]*/);
+          break;
       }
+    }, onDone: () {
+      c.topics.forEach((t) => _unsubscribe(c, t));
+      clients.remove(c);
     });
   }
 
