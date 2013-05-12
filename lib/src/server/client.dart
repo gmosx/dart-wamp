@@ -13,7 +13,7 @@ class Client {
   }
 
   void send(msg) {
-    socket.send(JSON.stringify(msg));
+    socket.add(JSON.stringify(msg));
   }
 
   void welcome([serverId = "srv"]) {

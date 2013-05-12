@@ -11,11 +11,22 @@ part 'src/server/client.dart';
 /**
  * Server-side handler for wamp connections.
  */
-class WampHandler {
+class WampHandler implements StreamConsumer {
   Set<Client> clients = new Set();
   Map<String, Set<Client>> topicMap = new Map();
   CurieCodec curie = new CurieCodec();
-  
+
+  Future addStream(Stream<WebSocket> stream) {
+    stream.listen((socket) {
+      handle(socket);
+    });
+    return new Future.value(stream); // TODO: what to return here?
+  }
+
+  Future close() {
+    return new Future.value(); // TODO: what to do here?
+  }
+
   void handle(WebSocket socket) {
     var c = new Client(socket)..welcome();
 
