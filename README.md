@@ -17,6 +17,14 @@ Example
 
 Have a look at the included example that implements a simple chat room.
 
+Notes to Contributors
+---------------------
+
+If you'd like to contribute back to the project, you can fork this repository 
+and send us a pull request, when it is ready.
+
+If you are new to Git or GitHub, please read this guide first.
+
 Legal
 -----
 
