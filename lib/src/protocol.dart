@@ -2,6 +2,11 @@ part of wamp;
 
 const int PROTOCOL_VERSION = 1;
 
+abstract class WampProtocol {
+  static const String URI_WAMP_BASE = "http://api.wamp.ws/";
+  static const String URI_WAMP_PROCEDURE = "http://api.wamp.ws/procedure#";
+}
+
 /**
  * WAMP defines the message types which are used in the communication between
  * two WebSocket endpoints, the client and the server, and describes associated

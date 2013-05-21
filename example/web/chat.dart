@@ -1,10 +1,10 @@
 import 'dart:html';
 import 'package:wamp/wamp_client.dart';
 
-class ChatClient extends WampClient {
+class ChatClient extends WampClientProtocol {
   ChatClient(socket) : super(socket);
 
-  onWelcome() {
+  onOpenSession() {
     subscribe('chat:room');
   }
 
