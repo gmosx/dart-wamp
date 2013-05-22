@@ -73,7 +73,7 @@ class WampClientProtocol {
   /**
    * A remote procedure call.
    */
-  Future call(uri, args) {
+  Future call(uri, [args]) {
     var rnd = new Random(), // TODO: Extract this!
         callId = rnd.nextInt(99999).toString(); // TODO: use some kind of hash.
 
@@ -84,7 +84,7 @@ class WampClientProtocol {
     var msg = [MessageType.CALL, callId, uri];
     if (args is List) {
       msg.addAll(args);
-    } else {
+    } else if (?args) {
       msg.add(args);
     }
     send(msg);
@@ -124,9 +124,8 @@ class WampCraClientProtocol extends WampClientProtocol {
   Future authenticate({authKey: "", authExtra: "", authSecret: ""}) {
     Future authreq = call(WampProtocol.URI_WAMP_PROCEDURE + "authreq", authKey);
     authreq.then((challenge) {
-      String sig = authSignature(challenge, authSecret);
-      Future auth = call(WampProtocol.URI_WAMP_PROCEDURE + "auth", sig);
-      return auth;
+      var sig = authSignature(challenge, authSecret);
+      return call(WampProtocol.URI_WAMP_PROCEDURE + "auth", sig);;
     });
     return authreq;
   }
