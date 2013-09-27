@@ -3,6 +3,7 @@ library wamp.client;
 import 'dart:html';
 import 'dart:json' as JSON;
 import 'dart:math';
+import 'dart:crypto';
 import 'dart:async';
 import 'package:wamp/wamp.dart';
 
@@ -11,14 +12,14 @@ import 'package:wamp/wamp.dart';
 /**
  * WAMP client.
  */
-class WampClient {
+class WampClientProtocol {
   WebSocket _socket;
 
   String sessionId;
   Map<String, String> prefixes = new Map();
   Map<String, Completer> callCompleters = new Map();
 
-  WampClient(this._socket) {
+  WampClientProtocol(this._socket) {
     _socket.onMessage.listen((e) => onMessage(JSON.parse(e.data)));
   }
 
@@ -26,7 +27,7 @@ class WampClient {
     switch (msg[0]) {
       case MessageType.WELCOME:
         sessionId = msg[1];
-        onWelcome();
+        onOpenSession();
         break;
 
       case MessageType.CALL_RESULT:
@@ -53,7 +54,7 @@ class WampClient {
     _socket.send(JSON.stringify(msg));
   }
 
-  void onWelcome() {
+  void onOpenSession() {
     // Override me!
   }
 
@@ -72,7 +73,7 @@ class WampClient {
   /**
    * A remote procedure call.
    */
-  Future call(uri, arg) {
+  Future call(uri, [args]) {
     var rnd = new Random(), // TODO: Extract this!
         callId = rnd.nextInt(99999).toString(); // TODO: use some kind of hash.
 
@@ -80,7 +81,13 @@ class WampClient {
 
     callCompleters[callId] = completer;
 
-    send([MessageType.CALL, callId, uri, arg]);
+    var msg = [MessageType.CALL, callId, uri];
+    if (args is List) {
+      msg.addAll(args);
+    } else if (?args) {
+      msg.add(args);
+    }
+    send(msg);
 
     return completer.future;
   }
@@ -105,4 +112,30 @@ class WampClient {
   void publish(String topicUri, event, [exclude, eligible]) { // TODO: convert to named parameters.
     send([MessageType.PUBLISH, topicUri, event]); //, exclude, eligible]);
   }
+}
+
+class WampCraClientProtocol extends WampClientProtocol {
+
+  WampCraClientProtocol(socket) : super(socket);
+
+  /*
+   * Authenticate the WAMP session to server.
+   */
+  Future authenticate({authKey: "", authExtra: "", authSecret: ""}) {
+    Future authreq = call(WampProtocol.URI_WAMP_PROCEDURE + "authreq", authKey);
+    return authreq.then((challenge) {
+      var sig = authSignature(challenge, authSecret);
+      return call(WampProtocol.URI_WAMP_PROCEDURE + "auth", sig);
+    });
+  }
+
+  /*
+   * Compute the authentication signature from an authentication challenge and a secret.
+   */
+  String authSignature(authChallenge, authSecret, [authExtra]) {
+    HMAC hash = new HMAC(new SHA256(), authSecret.codeUnits);
+    hash.add(authChallenge.codeUnits);
+    return CryptoUtils.bytesToBase64(hash.digest);
+  }
+
 }
