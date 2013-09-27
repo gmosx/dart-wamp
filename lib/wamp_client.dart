@@ -123,11 +123,10 @@ class WampCraClientProtocol extends WampClientProtocol {
    */
   Future authenticate({authKey: "", authExtra: "", authSecret: ""}) {
     Future authreq = call(WampProtocol.URI_WAMP_PROCEDURE + "authreq", authKey);
-    authreq.then((challenge) {
+    return authreq.then((challenge) {
       var sig = authSignature(challenge, authSecret);
-      return call(WampProtocol.URI_WAMP_PROCEDURE + "auth", sig);;
+      return call(WampProtocol.URI_WAMP_PROCEDURE + "auth", sig);
     });
-    return authreq;
   }
 
   /*
