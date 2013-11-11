@@ -1,7 +1,7 @@
 library wamp.client;
 
 import 'dart:html';
-import 'dart:json' as JSON;
+import 'dart:convert' show JSON;
 import 'dart:math';
 import 'dart:async';
 import 'package:wamp/wamp.dart';
@@ -19,7 +19,7 @@ class WampClient {
   Map<String, Completer> callCompleters = new Map();
 
   WampClient(this._socket) {
-    _socket.onMessage.listen((e) => onMessage(JSON.parse(e.data)));
+    _socket.onMessage.listen((e) => onMessage(JSON.decode(e.data)));
   }
 
   void onMessage(msg) {
@@ -50,7 +50,7 @@ class WampClient {
   }
 
   void send(msg) {
-    _socket.send(JSON.stringify(msg));
+    _socket.send(JSON.encode(msg));
   }
 
   void onWelcome() {

@@ -1,7 +1,7 @@
 library wamp.server;
 
 import 'dart:io';
-import 'dart:json' as JSON;
+import 'dart:convert' show JSON;
 import 'dart:math';
 import 'dart:async';
 import 'package:wamp/wamp.dart';
@@ -33,7 +33,7 @@ class WampHandler implements StreamConsumer {
     clients.add(c);
 
     socket.listen((data) {
-      final msg = JSON.parse(data);
+      final msg = JSON.decode(data);
 
       switch(msg[0]) {
         case MessageType.PREFIX:
