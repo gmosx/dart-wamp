@@ -12,7 +12,7 @@ void main() {
 
   HttpServer.bind('127.0.0.1', 8080).then((HttpServer server) {
     server.where((request) => request.uri.path == '/ws')
-          .transform(new WebSocketTransformer())
+          .transform(new WebSocketTransformer(protocolSelector: (_) => 'wamp'))
           .pipe(chatHandler);
   });
 }
