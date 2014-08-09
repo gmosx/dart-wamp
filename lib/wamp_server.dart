@@ -4,13 +4,13 @@ import 'dart:io';
 import 'dart:convert' show JSON;
 import 'dart:math';
 import 'dart:async';
+
 import 'package:wamp/wamp.dart';
+import 'package:uuid/uuid_server.dart';
 
 part 'src/server/client.dart';
 
-/**
- * Server-side handler for wamp connections.
- */
+/// Server-side handler for wamp connections.
 class WampHandler implements StreamConsumer {
   Set<Client> clients = new Set();
   Map<String, Set<Client>> topicMap = new Map();
@@ -28,7 +28,7 @@ class WampHandler implements StreamConsumer {
   }
 
   void handle(WebSocket socket) {
-    var c = new Client(socket)..welcome();
+    var c = new Client(socket, generateSessionId())..welcome();
 
     clients.add(c);
 
@@ -62,15 +62,12 @@ class WampHandler implements StreamConsumer {
     });
   }
 
-  /**
-   * To be overriden by subclasses.
-   */
+
+  /// To be overriden by subclasses.
   void onCall(Client c, String callId, String uri, arg) {
   }
 
-  /**
-   * Handle subscription events.
-   */
+  /// Handles subscription events.
   void onSubscribe(Client c, String topicUri) {
     var uri = curie.decode(topicUri);
 
@@ -103,9 +100,7 @@ class WampHandler implements StreamConsumer {
     }
   }
 
-  /**
-   * Publish an event to all the subscribed clients.
-   */
+  /// Sends an event to all the subscribed clients.
   void publish(String topicUri, event) {
     final uri = curie.decode(topicUri);
 
@@ -118,5 +113,11 @@ class WampHandler implements StreamConsumer {
         }
       });
     }
+  }
+
+  /// Generates an id for a client connection. By default uses UUID.v4, but
+  /// can be overriden to return custom ids.
+  String generateSessionId() {
+    return new Uuid().v4();
   }
 }

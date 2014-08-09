@@ -3,7 +3,7 @@ import 'package:wamp/wamp_server.dart';
 
 class ChatHandler extends WampHandler {
   void onCall(c, callId, uri, arg) {
-    c.callResult(callId, 'RPC message accepted: $uri');
+    c.callResult(callId, "RPC message accepted: $uri");
   }
 }
 

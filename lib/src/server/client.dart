@@ -1,5 +1,6 @@
 part of wamp.server;
 
+/// Represents a client connection.
 class Client {
   String sessionId;
   WebSocket socket;
@@ -7,9 +8,8 @@ class Client {
   Set<String> topics = new Set();
   Map<String, String> prefixes = new Map();
 
-  Client(this.socket) {
+  Client(this.socket, this.sessionId) {
     var rnd = new Random();
-    sessionId = rnd.nextInt(99999).toString(); // TODO: use some kind of hash.
   }
 
   void send(msg) {
