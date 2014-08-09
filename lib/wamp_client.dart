@@ -4,13 +4,11 @@ import 'dart:html';
 import 'dart:convert' show JSON;
 import 'dart:math';
 import 'dart:async';
+
 import 'package:wamp/wamp.dart';
 
 // TODO: add reconnect functionality.
 
-/**
- * WAMP client.
- */
 class WampClient {
   WebSocket _socket;
 
@@ -61,22 +59,16 @@ class WampClient {
     // Override me!
   }
 
-  /**
-   * Set a CURIE prefix.
-   */
+  /// Sets a CURIE prefix.
   void prefix(String prefix, String uri) {
     prefixes[prefix] = uri;
     send([MessageType.PREFIX, prefix, uri]);
   }
 
-  /**
-   * A remote procedure call.
-   */
+  /// Calls remote procedure.
   Future call(uri, arg) {
-    var rnd = new Random(), // TODO: Extract this!
-        callId = rnd.nextInt(99999).toString(); // TODO: use some kind of hash.
-
-    var completer = new Completer();
+    final callId = generateSessionId();
+    final completer = new Completer();
 
     callCompleters[callId] = completer;
 
@@ -85,24 +77,22 @@ class WampClient {
     return completer.future;
   }
 
-  /**
-   * Subscribe to the given topic.
-   */
+  /// Subscribes to the given topic.
   void subscribe(topicUri) {
     send([MessageType.SUBSCRIBE, topicUri]);
   }
 
-  /**
-   * Unsubscribe from the given topic.
-   */
+  /// Unsubscribes from the given topic.
   void unsubscribe(topicUri) {
     send([MessageType.UNSUBSCRIBE, topicUri]);
   }
 
-  /**
-   * Publish an event to the given topic.
-   */
+  /// Sends an event to the given topic.
   void publish(String topicUri, event, [exclude, eligible]) { // TODO: convert to named parameters.
     send([MessageType.PUBLISH, topicUri, event]); //, exclude, eligible]);
+  }
+
+  String generateSessionId() {
+    return new Random().nextInt(99999999).toString(); // TODO: use some kind of hash.
   }
 }
