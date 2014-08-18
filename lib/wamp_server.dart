@@ -33,7 +33,16 @@ class WampHandler implements StreamConsumer {
     clients.add(c);
 
     socket.listen((data) {
-      final msg = JSON.decode(data);
+      
+      var msg;
+      
+      try {
+        msg = JSON.decode(data);
+      } on FormatException {
+        socket.close(WebSocketStatus.UNSUPPORTED_DATA, 'Received data is not a valid JSON.');
+        
+        return;
+      }
 
       switch(msg[0]) {
         case MessageType.PREFIX:
@@ -60,6 +69,7 @@ class WampHandler implements StreamConsumer {
       c.topics.forEach((t) => _unsubscribe(c, t));
       clients.remove(c);
     });
+
   }
 
 
