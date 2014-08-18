@@ -1,12 +1,11 @@
 name: wamp
-version: 0.4.1
+version: 0.4.2
 author: George Moschovitis <george.moschovitis@gmail.com>
 description: An implementation of the WAMP (http://wamp.ws) protocol for Dart.
 homepage: https://github.com/gmosx/dart-wamp
 environment:
-  sdk: ">=0.8.10+6 <2.0.0"
+  sdk: '>=0.8.10+6 <2.0.0'
 dependencies:
-  uuid: ">=0.3.2 <0.4.0"
+  uuid: '>=0.3.2 <0.4.0'
 dev_dependencies:
-  browser: ">=0.10.0+2 <0.11.0"
-  
+  browser: '>=0.10.0+2 <0.11.0'

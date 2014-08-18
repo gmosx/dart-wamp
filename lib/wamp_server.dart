@@ -33,45 +33,40 @@ class WampHandler implements StreamConsumer {
     clients.add(c);
 
     socket.listen((data) {
-      
       var msg;
-      
+
       try {
         msg = JSON.decode(data);
+
+        switch(msg[0]) {
+          case MessageType.PREFIX:
+            c.prefixes[msg[1]] = msg[2];
+            break;
+
+          case MessageType.CALL:
+            onCall(c, msg[1], msg[2], msg[3]);
+            break;
+
+          case MessageType.SUBSCRIBE:
+            onSubscribe(c, msg[1]);
+            break;
+
+          case MessageType.UNSUBSCRIBE:
+            onUnsubscribe(c, msg[1]);
+            break;
+
+          case MessageType.PUBLISH:
+            onPublish(c, msg[1], msg[2]/*, msg[3], msg[4]*/);
+            break;
+        }
       } on FormatException {
-        socket.close(WebSocketStatus.UNSUPPORTED_DATA, 'Received data is not a valid JSON.');
-        
-        return;
-      }
-
-      switch(msg[0]) {
-        case MessageType.PREFIX:
-          c.prefixes[msg[1]] = msg[2];
-          break;
-
-        case MessageType.CALL:
-          onCall(c, msg[1], msg[2], msg[3]);
-          break;
-
-        case MessageType.SUBSCRIBE:
-          onSubscribe(c, msg[1]);
-          break;
-
-        case MessageType.UNSUBSCRIBE:
-          onUnsubscribe(c, msg[1]);
-          break;
-
-        case MessageType.PUBLISH:
-          onPublish(c, msg[1], msg[2]/*, msg[3], msg[4]*/);
-          break;
+        socket.close(WebSocketStatus.UNSUPPORTED_DATA, "Received data is not a valid JSON");
       }
     }, onDone: () {
       c.topics.forEach((t) => _unsubscribe(c, t));
       clients.remove(c);
     });
-
   }
-
 
   /// To be overriden by subclasses.
   void onCall(Client c, String callId, String uri, arg) {

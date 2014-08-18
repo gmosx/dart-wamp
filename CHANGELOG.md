@@ -1,6 +1,12 @@
 Changelog
 =========
 
+0.4.2
+-----
+
+Gracefully handle malformed JSON.
+
+
 0.4.0
 -----
 
