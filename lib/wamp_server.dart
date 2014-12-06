@@ -63,17 +63,38 @@ class WampHandler implements StreamConsumer {
         socket.close(WebSocketStatus.UNSUPPORTED_DATA, "Received data is not a valid JSON");
       }
     }, onDone: () {
-      c.topics.forEach((t) => _unsubscribe(c, t));
+      // Make a copy because unsubscription removes the topics from the client
+      (new Set.from(c.topics)).forEach((t) => unsubscribe(c, t));
       clients.remove(c);
+      onDone(c);
     });
   }
 
-  /// To be overriden by subclasses.
-  void onCall(Client c, String callId, String uri, arg) {
-  }
+  /// Handles Remote Procedure Calls (RPC).
+  /// To be overridden by subclasses.
+  void onCall(Client c, String callId, String uri, arg){}
+
+  /// Handles the closing of a websocket listener.
+  /// To be overridden by subclasses.
+  void onDone(Client c){}
 
   /// Handles subscription events.
   void onSubscribe(Client c, String topicUri) {
+    subscribe(c, topicUri);
+  }
+
+  /// Handles unsubscription events.
+  void onUnsubscribe(Client c, String topicUri) {
+    unsubscribe(c, topicUri);
+  }
+
+  /// Handles publication events.
+  void onPublish(Client c, String topicUri, event, [exclude, eligible]) { // TODO: handle exclude, eligible.
+    publish(topicUri, event);
+  }
+
+  /// Subscribes [c] to [topicUri].
+  void subscribe(Client c, String topicUri) {
     var uri = curie.decode(topicUri);
 
     c.topics.add(uri);
@@ -85,19 +106,11 @@ class WampHandler implements StreamConsumer {
     topicMap[uri].add(c);
   }
 
-  void onUnsubscribe(Client c, String topicUri) {
-    final uri = curie.decode(topicUri);
-    c.topics.remove(uri);
-
-    _unsubscribe(c, topicUri);
-  }
-
-  void onPublish(Client c, String topicUri, event, [exclude, eligible]) { // TODO: handle exclude, eligible.
-    publish(topicUri, event);
-  }
-
-  void _unsubscribe(Client c, String topicUri) {
+  /// Unsubscribes [c] from [topicUri].
+  void unsubscribe(Client c, String topicUri) {
     var uri = curie.decode(topicUri);
+
+    c.topics.remove(uri);
 
     if (topicMap.containsKey(uri)) {
       topicMap[uri].remove(c);
@@ -121,7 +134,7 @@ class WampHandler implements StreamConsumer {
   }
 
   /// Generates an id for a client connection. By default uses UUID.v4, but
-  /// can be overriden to return custom ids.
+  /// can be overridden to return custom ids.
   String generateSessionId() {
     return new Uuid().v4();
   }
